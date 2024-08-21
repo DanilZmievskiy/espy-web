@@ -1,0 +1,34 @@
+version: '2.10.2'
+services:
+  espy-web-frontend:
+    image: espy-web-frontend:latest
+    # volumes:
+    #   - /Users/danilzmievskiy/Documents/JS/espy-web/espy-lms:/app
+    environment:
+      PORT: 3000
+      PROXY_API: http://espy-web-backend:3001/
+    ports:
+      - 3000:3000
+  espy-web-backend:
+    image: espy-web-backend:latest
+    # volumes:
+    #   - /Users/danilzmievskiy/Documents/JS/espy-web/espy-api:/app
+    ports:
+      - 3001:3001
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/espy-db?schema=public"
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres
+    hostname: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: espy-db
+    volumes:
+      - /var/lib/docker/volumes/espy-data
+    restart: unless-stopped

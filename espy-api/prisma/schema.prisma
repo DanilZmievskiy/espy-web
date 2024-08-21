@@ -1,0 +1,64 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model order {
+  id                             Int        @id @default(autoincrement())
+  number                         Int
+  path_hubs                      String
+  price                          Int?
+  user                           Int
+  created_at                     DateTime?  @db.Timestamp(6)
+  status                         status
+  id_driver                      Int?
+  user_order_userTouser          user       @relation("order_userTouser", fields: [user], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_order__user")
+  tracking_tracking_orderToorder tracking[] @relation("tracking_orderToorder")
+
+  @@index([user], map: "idx_order__user")
+}
+
+model tracking {
+  id                          Int      @id @default(autoincrement())
+  order                       Int
+  arrived_time                DateTime @db.Timestamp(6)
+  hub                         String
+  order_tracking_orderToorder order    @relation("tracking_orderToorder", fields: [order], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_tracking__order")
+
+  @@index([order], map: "idx_tracking__order")
+}
+
+model user {
+  id                     Int       @id @default(autoincrement())
+  username               String    @db.VarChar(25)
+  email                  String    @db.VarChar(40)
+  password               String
+  role                   user_role
+  phone                  String
+  order_order_userTouser order[]   @relation("order_userTouser")
+}
+
+model path {
+  id       Int    @id @default(autoincrement())
+  hub_from String
+  hub_to   String
+  all_hubs String
+  price    String
+}
+
+enum status {
+  created
+  approved
+  working
+  completed
+}
+
+enum user_role {
+  client
+  admin
+  driver
+}
